@@ -9,10 +9,6 @@
 //   email: string;
 //   password: string;
 //   confirmPassword: string;
-//   phone: string;
-//   age: string;
-//   gender: string;
-//   address: string;
 // }
 
 // interface FormErrors {
@@ -22,30 +18,29 @@
 //   email?: string;
 //   password?: string;
 //   confirmPassword?: string;
-//   phone?: string;
-//   age?: string;
-//   gender?: string;
-//   address?: string;
 // }
 
 // export default function LoginPage() {
-//   const [formData, setFormData] = useState<FormData>({
+
+//   const initialFormData: FormData = {
 //     name: "",
 //     firstName: "",
 //     lastName: "",
 //     email: "",
 //     password: "",
 //     confirmPassword: "",
-//     phone: "",
-//     age: "",
-//     gender: "",
-//     address: "",
-//   });
+//   };
 
-//   const [errors, setErrors] = useState<FormErrors>({});
+//   const [formData, setFormData] =
+//     useState<FormData>(initialFormData);
 
+//   const [errors, setErrors] =
+//     useState<FormErrors>({});
+//   const [loading, setLoading] = useState<boolean>(false)
+//   const [apiError, setApiError] = useState<string | null>(null)
+//   const [success, setSuccess] = useState<boolean>(false);
 //   const handleChange = (
-//     e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+//     e: ChangeEvent<HTMLInputElement>
 //   ) => {
 //     const { name, value } = e.target;
 
@@ -55,481 +50,241 @@
 //     }));
 //   };
 
+
 //   const validate = (): FormErrors => {
+
 //     const newErrors: FormErrors = {};
 
-    
-//     if (!formData.name.trim()) {
-//       newErrors.name = "Name is required";
-//     }
-
-//     if (!formData.firstName.trim()) {
-//       newErrors.firstName = "First Name is required";
-//     }
-
-//     if (!formData.lastName.trim()) {
-//       newErrors.lastName = "Last Name is required";
-//     }
-
+//     const emailRegex =
+//       /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 //     if (!formData.email) {
 //       newErrors.email = "Email is required";
-//     } else if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
+//     }
+//     else if (!emailRegex.test(formData.email)) {
 //       newErrors.email = "Invalid email format";
 //     }
 
-   
-//     if (!formData.password) {
-//       newErrors.password = "Password is required";
-//     } else if (formData.password.length < 6) {
-//       newErrors.password = "Password must be at least 6 characters";
-//     } else if (!/[A-Z]/.test(formData.password)) {
+//     if (formData.password.length < 6) {
 //       newErrors.password =
-//         "Password must contain at least 1 uppercase letter";
-//     } else if (!/[0-9]/.test(formData.password)) {
-//       newErrors.password = "Password must contain at least 1 number";
+//         "Password must be at least 6 characters";
 //     }
 
-    
-//     if (!formData.confirmPassword) {
-//       newErrors.confirmPassword = "Confirm Password is required";
-//     } else if (formData.password !== formData.confirmPassword) {
+
+//     if (formData.confirmPassword !== formData.password) {
 //       newErrors.confirmPassword = "Passwords do not match";
 //     }
 
-    
-//     if (!formData.phone) {
-//       newErrors.phone = "Phone number is required";
-//     } else if (!/^[0-9]{10}$/.test(formData.phone)) {
-//       newErrors.phone = "Phone must be 10 digits";
-//     }
-
-   
-//     if (!formData.age) {
-//       newErrors.age = "Age is required";
-//     } else if (Number(formData.age) < 18) {
-//       newErrors.age = "Age must be 18 or above";
-//     }
-
-//     if (!formData.gender) {
-//       newErrors.gender = "Please select gender";
-//     }
-
-    
-//     if (!formData.address.trim()) {
-//       newErrors.address = "Address is required";
-//     }
 
 //     return newErrors;
 //   };
 
-//   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-//     e.preventDefault();
 
+//   const handleSubmit = async (
+//     e: FormEvent<HTMLFormElement>
+//   ) => {
+//     e.preventDefault();
+//     setSuccess(false);
 //     const validationErrors = validate();
-//     setErrors(validationErrors);
+
+//     if (Object.keys(validationErrors).length > 0) {
+//       setErrors(validationErrors);
+//     }
+
 
 //     if (Object.keys(validationErrors).length === 0) {
-//       alert("Form Submitted Successfully ✅");
-//       handleReset();
+//       console.log("Form Submitted:", formData);
+//     }
+//     try {
+//       setLoading(true);
+//       setApiError(null);
+
+//       const response = await fetch(
+//         "https://jsonplaceholder.typicode.com/posts", {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json"
+//         },
+//         body: JSON.stringify(formData)
+//       }
+//       );
+//       if (!response.ok) {
+//         throw new Error("failed to login");
+//       }
+//       const data = await response.json();
+//       console.log("Success", data);
+//       setSuccess(true);
+
+//     }
+//     catch (error) {
+//       if (error instanceof Error) {
+//         setApiError(error.message);
+//       }
+//     }
+//     finally {
+//       setLoading(false);
 //     }
 //   };
 
-//   const handleReset = () => {
-//     setFormData({
-//       name: "",
-//       firstName: "",
-//       lastName: "",
-//       email: "",
-//       password: "",
-//       confirmPassword: "",
-//       phone: "",
-//       age: "",
-//       gender: "",
-//       address: "",
-//     });
-//     setErrors({});
-//   };
 
 //   return (
 //     <div className="min-h-screen flex items-center justify-center bg-gray-100">
 //       <form
 //         onSubmit={handleSubmit}
-//         className="bg-white p-8 rounded-lg shadow-md w-96"
-//       >
-//         <h2 className="text-xl font-bold mb-4 text-center">
-//           Registration Form
-//         </h2>
 
-      
-//         <input
-//           type="text"
-//           name="name"
-//           value={formData.name}
-//           onChange={handleChange}
-//           placeholder="Full Name"
-//           className="border p-2 rounded mb-1 w-full"
-//         />
-//         {errors.name && (
-//           <p className="text-red-500 text-sm mb-3">{errors.name}</p>
-//         )}
+//         className="bg-blue-200 p-8 rounded-lg shadow-md w-96"
+//       ><h2 className="text-2xl font-bold mb-4">login</h2>
 
-        
 //         <input
 //           type="text"
 //           name="firstName"
 //           value={formData.firstName}
 //           onChange={handleChange}
-//           placeholder="First Name"
-//           className="border p-2 rounded mb-1 w-full"
+//           placeholder="Enter First Name"
+//           className="border p-2 text-blue-500 rounded mb-2 w-full"
 //         />
-//         {errors.firstName && (
-//           <p className="text-red-500 text-sm mb-3">{errors.firstName}</p>
-//         )}
+//         {errors.firstName && <p>{errors.firstName}</p>}
 
-        
 //         <input
 //           type="text"
 //           name="lastName"
 //           value={formData.lastName}
 //           onChange={handleChange}
-//           placeholder="Last Name"
-//           className="border p-2 rounded mb-1 w-full"
+//           placeholder="Enter Last Name"
+//           className="border p-2 rounded text-blue-500 mb-2 w-full"
 //         />
-//         {errors.lastName && (
-//           <p className="text-red-500 text-sm mb-3">{errors.lastName}</p>
-//         )}
 
-      
 //         <input
 //           type="email"
 //           name="email"
 //           value={formData.email}
 //           onChange={handleChange}
 //           placeholder="Email"
-//           className="border p-2 rounded mb-1 w-full"
+//           className={`border p-2 text-blue-500 rounded mb-2 w-full ${errors.email ? "border-red-500" : ""}`}
 //         />
-//         {errors.email && (
-//           <p className="text-red-500 text-sm mb-3">{errors.email}</p>
-//         )}
+//         {errors.email && <p className="text-red-500">{errors.email}</p>}
 
-       
 //         <input
 //           type="password"
 //           name="password"
 //           value={formData.password}
 //           onChange={handleChange}
 //           placeholder="Password"
-//           className="border p-2 rounded mb-1 w-full"
+//           className="border p-2  text-blue-500 rounded mb-2 w-full"
 //         />
-//         {errors.password && (
-//           <p className="text-red-500 text-sm mb-3">{errors.password}</p>
-//         )}
+//         {errors.password && <p className="text-red-500">{errors.password}</p>}
 
-        
 //         <input
 //           type="password"
 //           name="confirmPassword"
 //           value={formData.confirmPassword}
 //           onChange={handleChange}
 //           placeholder="Confirm Password"
-//           className="border p-2 rounded mb-1 w-full"
+//           className="border text-blue-500 p-2 rounded mb-2 w-full"
 //         />
 //         {errors.confirmPassword && (
-//           <p className="text-red-500 text-sm mb-3">
-//             {errors.confirmPassword}
-//           </p>
+//           <p>{errors.confirmPassword}</p>
+//         )}
+//         {apiError && (
+//           <p className="text-red-600 text-sm mb-2 text-center">{apiError}</p>
 //         )}
 
-        
-//         <input
-//           type="text"
-//           name="phone"
-//           value={formData.phone}
-//           onChange={handleChange}
-//           placeholder="Phone Number"
-//           className="border p-2 rounded mb-1 w-full"
-//         />
-//         {errors.phone && (
-//           <p className="text-red-500 text-sm mb-3">{errors.phone}</p>
+//         {success && (
+//           <p className="text-green-600 text-sm mb-2 text-center">login success ful</p>
 //         )}
-
-      
-//         <input
-//           type="number"
-//           name="age"
-//           value={formData.age}
-//           onChange={handleChange}
-//           placeholder="Age"
-//           className="border p-2 rounded mb-1 w-full"
-//         />
-//         {errors.age && (
-//           <p className="text-red-500 text-sm mb-3">{errors.age}</p>
-//         )}
-
-      
-//         <select
-//           name="gender"
-//           value={formData.gender}
-//           onChange={handleChange}
-//           className="border p-2 rounded mb-1 w-full"
+//         <button
+//           type="submit"
+//           className="bg-blue-500 text-white p-2 rounded w-full"
 //         >
-//           <option value="">Select Gender</option>
-//           <option value="Male">Male</option>
-//           <option value="Female">Female</option>
-//           <option value="Other">Other</option>
-//         </select>
-//         {errors.gender && (
-//           <p className="text-red-500 text-sm mb-3">{errors.gender}</p>
-//         )}
+//           Submit
+//         </button>
 
-       
-//         <textarea
-//           name="address"
-//           value={formData.address}
-//           onChange={handleChange}
-//           placeholder="Address"
-//           className="border p-2 rounded mb-1 w-full"
-//         />
-//         {errors.address && (
-//           <p className="text-red-500 text-sm mb-3">{errors.address}</p>
-//         )}
-
-       
-//         <div className="flex gap-4 mt-4">
-//           <button
-//             type="submit"
-//             className="bg-blue-500 text-white p-2 rounded w-1/2"
-//           >
-//             Submit
-//           </button>
-
-//           <button
-//             type="button"
-//             onClick={handleReset}
-//             className="bg-gray-300 text-gray-700 p-2 rounded w-1/2"
-//           >
-//             Reset
-//           </button>
-//         </div>
 //       </form>
 //     </div>
 //   );
 // }
 
+
+
+
+
+//Data fetching with useEffect
+
 "use client";
 
-import React, { useState, ChangeEvent, FormEvent } from "react";
+import React from "react";
+import { useState, useEffect, use } from "react";
+import { set } from "react-hook-form";
 
-interface FormData {
+interface User {
+  id: number;
   name: string;
   email: string;
-  password: string;
-  confirmPassword: string;
-  phone: string;
+}   
+
+export default function UserPage() {
+    const [users, setUsers] = useState<User[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                const response = await fetch("https://jsonplaceholder.typicode.com/users");     
+                if (!response.ok) {
+                    throw new Error("Failed to fetch users");
+                }
+                const data: User[] = await response.json();
+                setUsers(data);
+            }   
+            catch (error) {
+                if (error instanceof Error) {
+                    setError(error.message);
+                }
+            }
+            finally {
+                setLoading(false);
+            }
+        };
+
+        fetchUsers();
+    }, []);
+            if (loading) {
+                return (
+                    <div className="min-h-screen flex items-center justify-center">
+                        <p className="text-lg text-blue-500">Loading users...</p>
+                    </div>
+                );
+            }
+            if (error) {
+                return (
+                    <div className="min-h-screen flex items-center justify-center">
+                        <p className="text-lg text-red-500">Error: {error}</p>
+                    </div>
+                );
+            }
+            if (users.length === 0) {
+                return (
+                    <div className="min-h-screen flex items-center justify-center">
+                        <p className="text-lg text-gray-500">No users found.</p>
+                    </div>
+                );
+            }
+    return (
+        <div className="min-h-screen bg-gray-100 p-8">
+            <h2 className="text-2xl font-bold mb-4">User List</h2>
+            <div className="grid gap-4 max-w-3xl mx-auto">
+                {users.map((user) => (
+                    <div key={user.id} className="bg-white p-4 rounded shadow">
+                        <h3 className="text-lg font-semibold">{user.name}</h3>
+                        <p className="text-gray-600">{user.email}</p>
+                    </div>
+                ))}
+            </div>      
+        </div>
+    );
 }
 
-interface FormErrors {
-  name?: string;
-  email?: string;
-  password?: string;
-  confirmPassword?: string;
-  phone?: string;
-}
-
-export default function LoginPage() {
-  const [formData, setFormData] = useState<FormData>({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    phone: "",
-  });
-
-  const [errors, setErrors] = useState<FormErrors>({});
-  const [loading, setLoading] = useState<boolean>(false);
-  const [success, setSuccess] = useState<boolean>(false);
-  const [apiError, setApiError] = useState<string | null>(null);
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const validate = (): FormErrors => {
-    const newErrors: FormErrors = {};
-
-    if (!formData.name.trim()) {
-      newErrors.name = "Name is required";
-    }
-
-    if (!formData.email) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Email is invalid";
-    }
-
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
-    }
-
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = "Confirm your password";
-    } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
-    }
-
-    if (!formData.phone) {
-      newErrors.phone = "Phone number is required";
-    } else if (!/^[0-9]{10}$/.test(formData.phone)) {
-      newErrors.phone = "Phone must be 10 digits";
-    }
-
-    return newErrors;
-  };
-
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setSuccess(false);
-    setApiError(null);
-
-    const validationErrors = validate();
-
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
-
-    try {
-      setLoading(true);
-
-     
-      await new Promise((res) => setTimeout(res, 1000));
-
-      console.log("Form is valid", formData);
-      setSuccess(true);
-      setErrors({});
-    } catch (err) {
-      setApiError("Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-6 rounded shadow-md w-96"
-      >
-        <h2 className="text-xl font-bold mb-4 text-black">
-          Login Form
-        </h2>
-
-        
-        <input
-          type="text"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          placeholder="Enter name"
-          className={`w-full p-2 border rounded mb-2 text-black placeholder-gray-500 ${
-            errors.name ? "border-red-500" : "border-gray-300"
-          }`}
-        />
-        {errors.name && (
-          <p className="text-red-500 text-sm mb-2">{errors.name}</p>
-        )}
-
-      
-        <input
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          placeholder="Enter email"
-          className={`w-full p-2 border rounded mb-2 text-black placeholder-gray-500 ${
-            errors.email ? "border-red-500" : "border-gray-300"
-          }`}
-        />
-        {errors.email && (
-          <p className="text-red-500 text-sm mb-2">{errors.email}</p>
-        )}
-
-       
-        <input
-          type="password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-          placeholder="Enter password"
-          className={`w-full p-2 border rounded mb-2 text-black placeholder-gray-500 ${
-            errors.password ? "border-red-500" : "border-gray-300"
-          }`}
-        />
-        {errors.password && (
-          <p className="text-red-500 text-sm mb-2">{errors.password}</p>
-        )}
-
-        <input
-          type="password"
-          name="confirmPassword"
-          value={formData.confirmPassword}
-          onChange={handleChange}
-          placeholder="Confirm password"
-          className={`w-full p-2 border rounded mb-2 text-black placeholder-gray-500 ${
-            errors.confirmPassword
-              ? "border-red-500"
-              : "border-gray-300"
-          }`}
-        />
-        {errors.confirmPassword && (
-          <p className="text-red-500 text-sm mb-2">
-            {errors.confirmPassword}
-          </p>
-        )}
-
-     
-        <input
-          type="text"
-          name="phone"
-          value={formData.phone}
-          onChange={handleChange}
-          placeholder="Phone number"
-          className={`w-full p-2 border rounded mb-2 text-black placeholder-gray-500 ${
-            errors.phone ? "border-red-500" : "border-gray-300"
-          }`}
-        />
-        {errors.phone && (
-          <p className="text-red-500 text-sm mb-2">{errors.phone}</p>
-        )}
-
-       
-        {apiError && (
-          <p className="text-red-600 text-sm mb-2">{apiError}</p>
-        )}
-
-       
-        {success && (
-          <p className="text-green-600 text-sm mb-2">
-            Login successful!!
-          </p>
-        )}
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-blue-500 text-white p-2 rounded mt-2 disabled:opacity-50"
-        >
-          {loading ? "Submitting..." : "Submit"}
-        </button>
-      </form>
-    </div>
-  );
-}
+            
